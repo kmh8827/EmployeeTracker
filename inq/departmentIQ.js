@@ -1,3 +1,4 @@
+const Department = require('../lib/departmentCL');
 const { prompt } = require('inquirer');
 
 const addDep = () => {
@@ -10,6 +11,9 @@ const addDep = () => {
             choices: ['Engineering', 'Finance', 'Legal', 'Sales']
         }
     ]).then(results => {
-        return results.department;
+        const { department } = results;
+
+        const newDep = Department(department);
+        return newDep;
     });
 }
