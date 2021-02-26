@@ -1,7 +1,24 @@
-const { promp } = require('inquirer');
+const { prompt } = require('inquirer');
 
-promp([
+const addEmployee = () => {
 
-]).then(results => {
+    prompt([
+        {
 
-});
+        }
+    ]).then(results => {
+
+    });
+
+}
+
+const remEmployee = () => {
+
+    prompt([
+        {
+            
+        }
+    ]).then(results => {
+
+    });
+}

@@ -1,8 +1,8 @@
-const { promp } = require('inquirer');
+const { prompt } = require('inquirer');
 
 const addDep = () => {
 
-    promp([
+    prompt([
         {
             name: 'department',
             type: 'list',
