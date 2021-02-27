@@ -1,0 +1,7 @@
+first_name, last_name, role_id, manager_id, name, title, salary, department_id
+Amon, Gus, 1, 1, Sales, Sales Lead, 100000, 01
+Bob, Bobson, 2, 2, Engineering, Engineer Lead, 150000, 02
+Jack, Jackson, 3, 3, Legal, Lawer, 200000, 03
+Darl, Darlson, 4, 4, Finance, Head Financier, 80000, 04
+Aaron, Aaronson, 1, 1, Sales, Sales Assistant, 60000, 01
+Sally, Sallyson, 2, 2, Engineering, Engineer Assistant, 125000, 02
