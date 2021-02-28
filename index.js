@@ -21,25 +21,25 @@ prompt(
     ]).then(results => {
         switch (results.choices) {
             case 'viewEmp':
-                viewEmployee();
+                SQL.viewEmployee();
                 break;
             case 'addEmp':
-                addEmployee();
+                SQL.addEmployee();
                 break;
             case 'viewDep':
-                viewDepartment();
+                SQL.viewDepartment();
                 break;
             case 'addDep':
-                addDepartment();
+                SQL.addDepartment();
                 break;
             case 'viewRol':
-                viewRoles();
+                SQL.viewRoles();
                 break;
             case 'addRol':
-                addRoles();
+                SQL.addRoles();
                 break;
             case 'updRol':
-                updateRoles();
+                SQL.updateRoles();
                 break;
             case 'exit':
                 exit();

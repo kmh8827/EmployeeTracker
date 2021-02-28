@@ -22,7 +22,14 @@ class Roles {
                 choices: roles
             }
         ]).then(results => {
-            return results.role;
+
+            const newRole = {
+                employee: results.employee,
+                role: results.role
+            };
+            
+            return newRole;
+
         });
     }
 
