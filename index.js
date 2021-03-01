@@ -47,13 +47,16 @@ const viewDepartment = () => {
     connection.query('SELECT * FROM department', (err, result) => {
         if (err) throw err;
         console.table(result);
+
+        start();
     });
 
 }
 
 const addDepartment = () => {
-    connection.query('', (err, result) => {
+    connection.query('INSERT ? INTO department', (err, result) => {
         if (err) throw err;
+
         console.table(result);
 
         start();
