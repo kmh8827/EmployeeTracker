@@ -54,7 +54,7 @@ class Roles {
         ]).then(results => {
             const { role, salary, id } = results;
 
-            const newRole = Roles(role, salary, id);
+            const newRole = Role(role, salary, id);
             return newRole;
         })
     }
