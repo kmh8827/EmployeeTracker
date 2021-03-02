@@ -12,29 +12,6 @@ connection = mysql.createConnection({
     database: 'employee_tracker_db'
 });
 
-const addDep = () => {
-
-    prompt([
-        {
-            name: 'department',
-            type: 'list',
-            message: 'What department would you like to add?',
-            choices: ['Engineering', 'Finance', 'Legal', 'Sales']
-        }
-    ]).then(results => {
-        const { department } = results;
-
-        const newDep = Department(department);
-        return newDep;
-    });
-}
-
-const addEmp = () => {
-
-  
-
-}
-
 const updateEmployeeRole = () => {
 
     prompt([
@@ -62,7 +39,7 @@ const updateEmployeeRole = () => {
     });
 }
 
-const addRole = () => {
+const addRoles = () => {
 
     prompt([
         {
@@ -83,8 +60,12 @@ const addRole = () => {
     ]).then(results => {
         const { role, salary, id } = results;
 
-        const newRole = Role(role, salary, id);
-        return newRole;
+        connection.query('INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)', [role, salary, id], (err, result) => {
+            if (err) throw err;
+
+            start();
+        });
+
     })
 }
 
@@ -127,16 +108,16 @@ const addEmployee = () => {
         role = parseInt(role);
         manager = parseInt(manager);
 
-        connection.query('INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)', 
-        [first, last, role, manager], 
-        (err, result) => {
-            if (err) throw err;
+        connection.query('INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)',
+            [first, last, role, manager],
+            (err, result) => {
+                if (err) throw err;
 
-            start();
-        });
+                start();
+            });
     });
 
-   
+
 }
 
 const viewDepartment = () => {
@@ -151,14 +132,21 @@ const viewDepartment = () => {
 }
 
 const addDepartment = () => {
-    const newDepartment = new Departments();
+    prompt([
+        {
+            name: 'department',
+            type: 'input',
+            message: 'What department would you like to add?'
+        }
+    ]).then(results => {
+        const { department } = results;
 
-    connection.query('INSERT ? INTO department', [newDepartment], (err, result) => {
+    connection.query('INSERT INTO department (name) VALUES (?)', [department], (err, result) => {
         if (err) throw err;
-        console.table(result);
 
         start();
     });
+});
 }
 
 const viewRoles = () => {
@@ -172,17 +160,6 @@ const viewRoles = () => {
 
 }
 
-const addRoles = () => {
-    const newRole = new Roles();
-
-    connection.query('INSERT ? INTO role', [newRole], (err, result) => {
-        if (err) throw err;
-        console.table(result);
-
-        start();
-    });
-
-}
 
 const updateRoles = () => {
     const updateRoles = new Roles();
@@ -238,8 +215,8 @@ const start = () => {
                 updateRoles();
                 break;
             case 'exit':
-            console.log('GOODBYE');
-            break;
+                console.log('GOODBYE');
+                break;
         }
     });
 
