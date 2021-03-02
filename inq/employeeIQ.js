@@ -1,45 +1,36 @@
 const Employee = require('../lib/employeeCL');
 const { prompt } = require('inquirer');
 
-let roles = [];
-let managers = [];
+const addEmp = (roles, managers) => {
 
-class Employees {
+    prompt([
+        {
+            name: 'first',
+            type: 'input',
+            message: 'What is the employees first name?'
+        },
+        {
+            name: 'last',
+            type: 'input',
+            message: 'What is the employees last name?'
+        },
+        {
+            name: 'role',
+            type: 'input',
+            message: 'What is the employees role?',
+        },
+        {
+            name: 'manager',
+            type: 'input',
+            message: 'Who is this employees manager?',
+        }
+    ]).then(results => {
+        const { first, last, role, manager } = results;
 
-    addEmployee = () => {
-
-        prompt([
-            {
-                name: 'first',
-                type: 'input',
-                message: 'What is the employees first name?'
-            },
-            {
-                name: 'last',
-                type: 'input',
-                message: 'What is the employees last name?'
-            },
-            {
-                name: 'role',
-                type: 'list',
-                message: 'What is the employees role?',
-                choices: roles
-            },
-            {
-                name: 'manager',
-                type: 'list',
-                message: 'Who is this employees manager?',
-                choices: managers
-            }
-        ]).then(results => {
-            const { first, last, role, manager } = results;
-
-            const newEmp = new Employee(first, last, role, manager);
-            return newEmp;
-        });
-
-    }
+        const newEmp = new Employee(first, last, role, manager);
+        return newEmp;
+    });
 
 }
 
-module.exports = Employees;
+module.exports = { addEmp };

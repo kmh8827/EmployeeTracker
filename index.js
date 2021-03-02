@@ -1,9 +1,8 @@
-const Departments = require('./inq/departmentIQ');
-const Empoyees = require('./inq/employeeIQ');
-const Roles = require('./inq/rolesIQ');
-
 const { prompt } = require('inquirer');
 const mysql = require('mysql');
+const Department = require('./lib/departmentCL');
+const Employee = require('./lib/employeeCL');
+const Role = require('./lib/rolesCL');
 
 connection = mysql.createConnection({
     host: 'localhost',
@@ -13,12 +12,81 @@ connection = mysql.createConnection({
     database: 'employee_tracker_db'
 });
 
-connection.connect((err) => {
-    if (err) throw err;
-    console.log(`Connected with id ${connection.threadId}`);
+const addDep = () => {
 
-    start();
-});
+    prompt([
+        {
+            name: 'department',
+            type: 'list',
+            message: 'What department would you like to add?',
+            choices: ['Engineering', 'Finance', 'Legal', 'Sales']
+        }
+    ]).then(results => {
+        const { department } = results;
+
+        const newDep = Department(department);
+        return newDep;
+    });
+}
+
+const addEmp = () => {
+
+  
+
+}
+
+const updateEmployeeRole = () => {
+
+    prompt([
+        {
+            name: 'employee',
+            type: 'list',
+            message: 'Which employee role would you like to update?',
+            choices: employees
+        },
+        {
+            name: 'role',
+            type: 'list',
+            message: 'What should their new role be?',
+            choices: roles
+        }
+    ]).then(results => {
+
+        const newRole = {
+            employee: results.employee,
+            role: results.role
+        };
+
+        return newRole;
+
+    });
+}
+
+const addRole = () => {
+
+    prompt([
+        {
+            name: 'role',
+            type: 'input',
+            message: 'What role would you like to add?'
+        },
+        {
+            name: 'salary',
+            type: 'input',
+            message: 'What is the salary for this role?'
+        },
+        {
+            name: 'id',
+            type: 'input',
+            message: 'What is the department id for this role?'
+        }
+    ]).then(results => {
+        const { role, salary, id } = results;
+
+        const newRole = Role(role, salary, id);
+        return newRole;
+    })
+}
 
 const viewEmployee = () => {
 
@@ -33,13 +101,42 @@ const viewEmployee = () => {
 
 const addEmployee = () => {
 
-    connection.query('SELECT * FROM employee', (err, result) => {
-        if (err) throw err;
-        console.table(result);
+    prompt([
+        {
+            name: 'first',
+            type: 'input',
+            message: 'What is the employees first name?'
+        },
+        {
+            name: 'last',
+            type: 'input',
+            message: 'What is the employees last name?'
+        },
+        {
+            name: 'role',
+            type: 'input',
+            message: 'What is the employees role?',
+        },
+        {
+            name: 'manager',
+            type: 'input',
+            message: 'Who is this employees manager?',
+        }
+    ]).then(results => {
+        let { first, last, role, manager } = results;
+        role = parseInt(role);
+        manager = parseInt(manager);
 
-        start();
+        connection.query('INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)', 
+        [first, last, role, manager], 
+        (err, result) => {
+            if (err) throw err;
+
+            start();
+        });
     });
 
+   
 }
 
 const viewDepartment = () => {
@@ -54,9 +151,10 @@ const viewDepartment = () => {
 }
 
 const addDepartment = () => {
-    connection.query('INSERT ? INTO department', (err, result) => {
-        if (err) throw err;
+    const newDepartment = new Departments();
 
+    connection.query('INSERT ? INTO department', [newDepartment], (err, result) => {
+        if (err) throw err;
         console.table(result);
 
         start();
@@ -75,11 +173,11 @@ const viewRoles = () => {
 }
 
 const addRoles = () => {
+    const newRole = new Roles();
 
-    connection.query('SELECT * FROM ', (err, result) => {
+    connection.query('INSERT ? INTO role', [newRole], (err, result) => {
         if (err) throw err;
-        const newRole = Roles.addRole();
-        connection.query('INSERT INTO role (title,salary,department_id) VALUES ?, [newRole]');
+        console.table(result);
 
         start();
     });
@@ -87,8 +185,9 @@ const addRoles = () => {
 }
 
 const updateRoles = () => {
+    const updateRoles = new Roles();
 
-    connection.query('', (err, result) => {
+    connection.query('SELECT * FROM employee WHERE id = ? ', [newRole], (err, result) => {
         if (err) throw err;
         console.table(result);
 
@@ -143,5 +242,12 @@ const start = () => {
             break;
         }
     });
+
 }
 
+connection.connect((err) => {
+    if (err) throw err;
+    console.log(`Connected with id ${connection.threadId}`);
+
+    start();
+});
