@@ -1,8 +1,5 @@
 const { prompt } = require('inquirer');
 const mysql = require('mysql');
-const Department = require('./lib/departmentCL');
-const Employee = require('./lib/employeeCL');
-const Role = require('./lib/rolesCL');
 
 connection = mysql.createConnection({
     host: 'localhost',
@@ -12,32 +9,6 @@ connection = mysql.createConnection({
     database: 'employee_tracker_db'
 });
 
-const updateEmployeeRole = () => {
-
-    prompt([
-        {
-            name: 'employee',
-            type: 'list',
-            message: 'Which employee role would you like to update?',
-            choices: employees
-        },
-        {
-            name: 'role',
-            type: 'list',
-            message: 'What should their new role be?',
-            choices: roles
-        }
-    ]).then(results => {
-
-        const newRole = {
-            employee: results.employee,
-            role: results.role
-        };
-
-        return newRole;
-
-    });
-}
 
 const addRoles = () => {
 
@@ -162,14 +133,29 @@ const viewRoles = () => {
 
 
 const updateRoles = () => {
-    const updateRoles = new Roles();
 
-    connection.query('SELECT * FROM employee WHERE id = ? ', [newRole], (err, result) => {
-        if (err) throw err;
-        console.table(result);
+    prompt([
+        {
+            name: 'employee',
+            type: 'input',
+            message: 'Which employee would you like to update?'
+        },
+        {
+            name: 'role',
+            type: 'input',
+            message: 'What should their new role be?',
+        }
+    ]).then(results => {
+        let { role, employee } = results;
+        role = parseInt(role);
+        connection.query('UPDATE employee SET role_id = (?) WHERE first_name = (?) ', [role, employee], (err, result) => {
+            if (err) throw err;
+            console.table(result);
+    
+            start();
+        });
 
-        start();
-    });
+});
 
 }
 
