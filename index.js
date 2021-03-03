@@ -230,6 +230,13 @@ const start = () => {
 connection.connect((err) => {
     if (err) throw err;
     console.log(`Connected with id ${connection.threadId}`);
+    let query = 'SELECT employee.first_name, employee.last_name, role.title, role.salary, role.department_id FROM employee ';
+    query = query + 'INNER JOIN role ON department_id WHERE department_id = role_id';
+    connection.query(query, (err, result) => {
+        if (err) throw err;
 
-    start();
+        console.table(result);
+        start();
+    });
+
 });
