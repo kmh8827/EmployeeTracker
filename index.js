@@ -41,7 +41,10 @@ const addRoles = () => {
 
 const viewEmployee = () => {
 
-    connection.query('SELECT * FROM employee', (err, result) => {
+    let query = 'SELECT employee.first_name, employee.last_name, role.title FROM employee ';
+    query = query + 'INNER JOIN role ON department_id WHERE department_id = role_id';
+
+    connection.query(query, (err, result) => {
         if (err) throw err;
         console.table(result);
 
@@ -52,47 +55,68 @@ const viewEmployee = () => {
 
 const addEmployee = () => {
 
-    prompt([
-        {
-            name: 'first',
-            type: 'input',
-            message: 'What is the employees first name?'
-        },
-        {
-            name: 'last',
-            type: 'input',
-            message: 'What is the employees last name?'
-        },
-        {
-            name: 'role',
-            type: 'input',
-            message: 'What is the employees role?',
-        },
-        {
-            name: 'manager',
-            type: 'input',
-            message: 'Who is this employees manager?',
-        }
-    ]).then(results => {
-        let { first, last, role, manager } = results;
-        role = parseInt(role);
-        manager = parseInt(manager);
+    connection.query('SELECT first_name, last_name, role_id FROM employee ', (err, result) => {
+        if (err) throw err;
+        let managers = (JSON.parse(JSON.stringify(result)));
 
-        connection.query('INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)',
-            [first, last, role, manager],
-            (err, result) => {
-                if (err) throw err;
+        managers = managers.map(function (obj) {
+            return obj.role_id + ' ' + obj.first_name + ' ' + obj.last_name;
+        });
 
-                start();
+        connection.query('SELECT title, salary, department_id FROM role ', (err, result) => {
+            if (err) throw err;
+            let roles = (JSON.parse(JSON.stringify(result)));
+
+            roles = roles.map(function (obj) {
+                return obj.department_id + ' ' + obj.title + ' ' + obj.salary;
             });
+
+            prompt([
+                {
+                    name: 'first',
+                    type: 'input',
+                    message: 'What is the employees first name?'
+                },
+                {
+                    name: 'last',
+                    type: 'input',
+                    message: 'What is the employees last name?'
+                },
+                {
+                    name: 'role',
+                    type: 'list',
+                    message: 'What is the employees role?',
+                    choices: roles
+                },
+                {
+                    name: 'manager',
+                    type: 'list',
+                    message: 'Who is this employees manager?',
+                    choices: managers
+                }
+            ]).then(results => {
+                let { first, last, role, manager } = results;
+                role = parseInt(role);
+                manager = parseInt(manager);
+
+                connection.query('INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)',
+                    [first, last, role, manager],
+                    (err, result) => {
+                        if (err) throw err;
+
+                        start();
+                    });
+            });
+
+
+        });
+
     });
-
-
 }
 
 const viewDepartment = () => {
 
-    connection.query('SELECT * FROM department', (err, result) => {
+    connection.query('SELECT name FROM department', (err, result) => {
         if (err) throw err;
         console.table(result);
 
@@ -111,17 +135,17 @@ const addDepartment = () => {
     ]).then(results => {
         const { department } = results;
 
-    connection.query('INSERT INTO department (name) VALUES (?)', [department], (err, result) => {
-        if (err) throw err;
+        connection.query('INSERT INTO department (name) VALUES (?)', [department], (err, result) => {
+            if (err) throw err;
 
-        start();
+            start();
+        });
     });
-});
 }
 
 const viewRoles = () => {
 
-    connection.query('SELECT * FROM role', (err, result) => {
+    connection.query('SELECT title, salary FROM role', (err, result) => {
         if (err) throw err;
         console.table(result);
 
@@ -163,17 +187,16 @@ const updateRoles = () => {
                 }
             ]).then(results => {
                 let { role, employee } = results;
-                console.log(results);
                 role = parseInt(role);
                 employee = employee.split(' ');
-                connection.query('UPDATE employee SET role_id = (?) WHERE first_name = (?) ', [role, employee[0]], (err, result) => {
+                connection.query('UPDATE employee SET role_id = (?) WHERE first_name = (?) AND last_name = (?) ', [role, employee[0], employee[1]], (err, result) => {
                     if (err) throw err;
                     console.table(result);
-            
+
                     start();
                 });
-        
-        });
+
+            });
         });
     });
 }
