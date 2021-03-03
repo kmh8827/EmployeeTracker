@@ -9,7 +9,6 @@ connection = mysql.createConnection({
     database: 'employee_tracker_db'
 });
 
-
 const addRoles = () => {
 
     prompt([
@@ -131,32 +130,52 @@ const viewRoles = () => {
 
 }
 
-
 const updateRoles = () => {
 
-    prompt([
-        {
-            name: 'employee',
-            type: 'input',
-            message: 'Which employee would you like to update?'
-        },
-        {
-            name: 'role',
-            type: 'input',
-            message: 'What should their new role be?',
-        }
-    ]).then(results => {
-        let { role, employee } = results;
-        role = parseInt(role);
-        connection.query('UPDATE employee SET role_id = (?) WHERE first_name = (?) ', [role, employee], (err, result) => {
-            if (err) throw err;
-            console.table(result);
-    
-            start();
+    connection.query('SELECT first_name, last_name FROM employee', (err, result) => {
+        if (err) throw err;
+        let employees = (JSON.parse(JSON.stringify(result)));
+
+        employees = employees.map(function (obj) {
+            return obj.first_name + ' ' + obj.last_name;
         });
 
-});
+        connection.query('SELECT department_id, title FROM role', (err, result) => {
+            if (err) throw err;
+            let roles = (JSON.parse(JSON.stringify(result)));
 
+            roles = roles.map(function (obj) {
+                return obj.department_id + ',' + obj.title;
+            });
+
+            prompt([
+                {
+                    name: 'employee',
+                    type: 'list',
+                    message: 'Which employee would you like to update?',
+                    choices: employees
+                },
+                {
+                    name: 'role',
+                    type: 'list',
+                    message: 'What should their new role be?',
+                    choices: roles
+                }
+            ]).then(results => {
+                let { role, employee } = results;
+                console.log(results);
+                role = parseInt(role);
+                employee = employee.split(' ');
+                connection.query('UPDATE employee SET role_id = (?) WHERE first_name = (?) ', [role, employee[0]], (err, result) => {
+                    if (err) throw err;
+                    console.table(result);
+            
+                    start();
+                });
+        
+        });
+        });
+    });
 }
 
 const start = () => {
