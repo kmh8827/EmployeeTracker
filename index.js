@@ -8,9 +8,9 @@ connection = mysql.createConnection({
     password: 'Threshmain',
     database: 'employee_tracker_db'
 });
-
+// Adds A Role to the roles table
 const addRoles = () => {
-
+    // Asks the user what the new role values should be
     prompt([
         {
             name: 'role',
@@ -29,7 +29,7 @@ const addRoles = () => {
         }
     ]).then(results => {
         const { role, salary, id } = results;
-
+        // INSERTS the new role into the role table
         connection.query('INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)', [role, salary, id], (err, result) => {
             if (err) throw err;
 
@@ -38,10 +38,10 @@ const addRoles = () => {
 
     })
 }
-
+// Displays the employee table
 const viewEmployee = () => {
-
-    let query = 'SELECT employee.first_name, employee.last_name, role.title FROM employee ';
+    // Shows the Employee table plus their department
+    let query = 'SELECT employee.first_name, employee.last_name, role.title, manager_id FROM employee ';
     query = query + 'INNER JOIN role ON department_id WHERE department_id = role_id';
 
     connection.query(query, (err, result) => {
@@ -52,9 +52,9 @@ const viewEmployee = () => {
     });
 
 };
-
+// Adds An Employee to the employee table
 const addEmployee = () => {
-
+    // Creates a manager array for the manager list
     connection.query('SELECT first_name, last_name, role_id FROM employee ', (err, result) => {
         if (err) throw err;
         let managers = (JSON.parse(JSON.stringify(result)));
@@ -62,7 +62,7 @@ const addEmployee = () => {
         managers = managers.map(function (obj) {
             return obj.role_id + ' ' + obj.first_name + ' ' + obj.last_name;
         });
-
+        // Creates a role array for the role list
         connection.query('SELECT title, salary, department_id FROM role ', (err, result) => {
             if (err) throw err;
             let roles = (JSON.parse(JSON.stringify(result)));
@@ -70,7 +70,7 @@ const addEmployee = () => {
             roles = roles.map(function (obj) {
                 return obj.department_id + ' ' + obj.title + ' ' + obj.salary;
             });
-
+            // Asks use what they want the employee values to be
             prompt([
                 {
                     name: 'first',
@@ -98,12 +98,12 @@ const addEmployee = () => {
                 let { first, last, role, manager } = results;
                 role = parseInt(role);
                 manager = parseInt(manager);
-
+                // INSERTS the new employee into the employee table
                 connection.query('INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)',
                     [first, last, role, manager],
                     (err, result) => {
                         if (err) throw err;
-
+                        // restarts the programs
                         start();
                     });
             });
@@ -113,9 +113,9 @@ const addEmployee = () => {
 
     });
 }
-
+// Displays the department table
 const viewDepartment = () => {
-
+    // Displays the department table 
     connection.query('SELECT name FROM department', (err, result) => {
         if (err) throw err;
         console.table(result);
@@ -124,8 +124,9 @@ const viewDepartment = () => {
     });
 
 }
-
+// Adds a department to the department table
 const addDepartment = () => {
+    // Asks the user what they want department values to be
     prompt([
         {
             name: 'department',
@@ -134,7 +135,7 @@ const addDepartment = () => {
         }
     ]).then(results => {
         const { department } = results;
-
+        // INSERTS new department into department table
         connection.query('INSERT INTO department (name) VALUES (?)', [department], (err, result) => {
             if (err) throw err;
 
@@ -142,9 +143,9 @@ const addDepartment = () => {
         });
     });
 }
-
+// Displays the role table
 const viewRoles = () => {
-
+    // Displays the role table
     connection.query('SELECT title, salary FROM role', (err, result) => {
         if (err) throw err;
         console.table(result);
@@ -153,9 +154,9 @@ const viewRoles = () => {
     });
 
 }
-
+// Changes an Employees Role
 const updateRoles = () => {
-
+    // Creates an array to show in the employee list
     connection.query('SELECT first_name, last_name FROM employee', (err, result) => {
         if (err) throw err;
         let employees = (JSON.parse(JSON.stringify(result)));
@@ -163,7 +164,7 @@ const updateRoles = () => {
         employees = employees.map(function (obj) {
             return obj.first_name + ' ' + obj.last_name;
         });
-
+        // Creates an array to show in the role list
         connection.query('SELECT department_id, title FROM role', (err, result) => {
             if (err) throw err;
             let roles = (JSON.parse(JSON.stringify(result)));
@@ -171,7 +172,7 @@ const updateRoles = () => {
             roles = roles.map(function (obj) {
                 return obj.department_id + ',' + obj.title;
             });
-
+            // Asks the user what employee to change to what role
             prompt([
                 {
                     name: 'employee',
@@ -189,6 +190,7 @@ const updateRoles = () => {
                 let { role, employee } = results;
                 role = parseInt(role);
                 employee = employee.split(' ');
+                // UPDATES the table to have the new employee role
                 connection.query('UPDATE employee SET role_id = (?) WHERE first_name = (?) AND last_name = (?) ', [role, employee[0], employee[1]], (err, result) => {
                     if (err) throw err;
                     console.table(result);
@@ -200,7 +202,7 @@ const updateRoles = () => {
         });
     });
 }
-
+// Starts the program and asks the user what they want to do
 const start = () => {
     prompt([{
         name: 'choice',
@@ -249,7 +251,7 @@ const start = () => {
     });
 
 }
-
+// Connects to the SQL Database
 connection.connect((err) => {
     if (err) throw err;
     console.log(`Connected with id ${connection.threadId}`);
